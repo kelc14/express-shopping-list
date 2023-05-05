@@ -45,6 +45,13 @@ describe("POST /items", function () {
       },
     });
   });
+
+  test("Attempt to add an invalid item to the database", async function () {
+    const resp = await request(app).post(`/items`).send({
+      price: 1.0,
+    });
+    expect(resp.statusCode).toBe(400);
+  });
 });
 
 describe("GET /items/:name", function () {
@@ -54,11 +61,15 @@ describe("GET /items/:name", function () {
 
     expect(resp.body).toEqual({ foundItem: item1 });
   });
+  test("Attempt to retrieve an invalid item from the database", async function () {
+    const resp = await request(app).get(`/items/notavaliditemname`);
+    expect(resp.statusCode).toBe(404);
+  });
 });
 
 describe("PATCH /items/:name", function () {
   test("Edit details about one specific item", async function () {
-    const resp = await await request(app)
+    const resp = await request(app)
       .patch(`/items/${item1.name}`)
       .send({ name: "Lollipops" });
     expect(resp.statusCode).toBe(200);
@@ -70,14 +81,25 @@ describe("PATCH /items/:name", function () {
       },
     });
   });
+
+  test("Attempt to patch an invalid item from the database", async function () {
+    const resp = await request(app).patch("/items/notavaliditemname");
+    expect(resp.statusCode).toBe(404);
+  });
 });
 
 describe("DELETE /items/:name", function () {
   test("Delete one specific item", async function () {
-    const resp = await await request(app).delete(`/items/${item1.name}`);
+    const resp = await request(app).delete(`/items/${item1.name}`);
 
     expect(resp.statusCode).toBe(200);
 
     expect(resp.body).toEqual({ message: "Deleted" });
+  });
+
+  test("Attempt to delete an invalid item from the database", async function () {
+    const resp = await request(app).delete(`/items/invalidItem`);
+
+    expect(resp.statusCode).toBe(404);
   });
 });
